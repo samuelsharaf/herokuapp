@@ -11,6 +11,33 @@ app.get('/', function(request, response) {
   response.send(buffer.toString('utf-8'));
 });
 
+app.get('/submitForm', function(request, response) {
+	
+	pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+		
+		console.log('******Received money as: ' + request.query.money);
+		
+		var firstName = request.query.firstname;
+		var lastName = request.query.lastname;
+		var money = request.query.money;
+		var teamid = 'a03j0000001P7Yh';
+		
+		client.query('INSERT into salesforce.follower__c (FirstName__c, LastName__c, Money_Donated__c, Team__c) VALUES ($1, $2, $3, $4)', [firstName, lastName, money, teamid],
+		//client.query('INSERT INTO salesforce.contact (FirstName, LastName) VALUES ($1, $2)', [firstName, lastName],
+		function(err, result) 
+		{
+			if (err) 
+			{
+		    	console.log(err);
+		    } else {
+		    	console.log('************row inserted');
+				response.redirect('/');
+			}
+		 
+	  });
+	});
+});
+
 app.listen(app.get('port'), function() {
   console.log("Node app is running at localhost:" + app.get('port'));
 });
